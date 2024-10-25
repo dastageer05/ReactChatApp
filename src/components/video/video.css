@@ -1,0 +1,59 @@
+.video {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent; /* Background color for the video container */
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(12, 121, 223, 0.295); /* Subtle shadow for depth */
+  padding: 20px;
+ /* Center the video component */
+  width: 100%;
+  height: auto;
+ 
+
+  h2 {
+    font-size: 1.1em; /* Heading size */
+    margin-bottom: 20px;
+    color: white; /* Text color */
+    padding: 10px;
+  }
+
+  video {
+    width: 100%; /* Responsive video width */
+  height: auto; /* Maintain aspect ratio */
+    border: 2px solid #007bff; /* Border color */
+    border-radius: 10px; /* Rounded corners for video */
+    margin-bottom: 20px; /* Space below the video */
+  }
+
+  button {
+    background-color: #007bff; /* Button background color */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 20px; /* Button padding */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 1em; /* Font size */
+    margin: 5px; /* Space between buttons */
+    transition: background-color 0.3s; /* Smooth background transition */
+  }
+
+  button:hover {
+    background-color: #0056b3; /* Darker background on hover */
+  }
+
+  input {
+    width: 100%; /* Full width input */
+    padding: 10px; /* Padding inside input */
+    border: 2px solid #007bff; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 1em; /* Font size */
+    margin-bottom: 10px; /* Space below input */
+  }
+
+  input:focus {
+    outline: none; /* No outline on focus */
+    border-color: #0056b3; /* Darker border on focus */
+  }
+}

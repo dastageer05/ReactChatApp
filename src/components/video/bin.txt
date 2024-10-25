@@ -1,0 +1,153 @@
+import React from "react";
+
+const VideoCall = ({ callerId, receiverId }) => {
+  // Use the existing Video.jsx logic and modify as needed to accept callerId and receiverId
+  // For instance, pass these ids when creating or answering a call
+
+  return (
+    <div>
+      <h2>Video Call between {callerId} and {receiverId}</h2>
+      {/* Include your video elements and buttons */}
+    </div>
+  );
+};
+
+export default VideoCall;
+
+
+
+import React, { useEffect, useRef, useState } from "react";
+// import { firestore } from "./firebase";
+import { db } from "../../lib/firebase";
+
+const servers = {
+  iceServers: [{ urls: ["stun:stun1.l.google.com:19302", 
+    "stun:global.stun.twilio.com:3478" ]}],
+};
+
+const Video = ({callerId, receiverId}) => {
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
+  const peerConnection = useRef(new RTCPeerConnection(servers));
+  const localStream = useRef(null);
+  const remoteStream = useRef(new MediaStream());
+
+  useEffect(() => {
+    peerConnection.current.onicecandidate = (event) => {
+      if (event.candidate) {
+        const candidatesCollection = db.collection("users").doc(callerId).collection("candidates");
+        candidatesCollection.add(event.candidate.toJSON());
+      }
+    };
+
+    peerConnection.current.ontrack = (event) => {
+      event.streams[0].getTracks().forEach((track) => {
+        remoteStream.current.addTrack(track);
+      });
+      remoteVideoRef.current.srcObject = remoteStream.current;
+    };
+
+    // Access the local video stream
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+      localStream.current = stream;
+      localVideoRef.current.srcObject = stream;
+
+      stream.getTracks().forEach((track) => {
+        peerConnection.current.addTrack(track, stream);
+      });
+    });
+  }, [callId]);
+
+  const createOffer = async () => {
+    const callDoc = firestore.collection("calls").doc();
+    const offerCandidates = callDoc.collection("offerCandidates");
+    const answerCandidates = callDoc.collection("answerCandidates");
+
+    setCallId(callDoc.id);
+
+    // Set up ice candidates for remote user
+    peerConnection.current.onicecandidate = (event) => {
+      if (event.candidate) {
+        offerCandidates.add(event.candidate.toJSON());
+      }
+    };
+
+    // Create offer and set as local description
+    const offerDescription = await peerConnection.current.createOffer();
+    await peerConnection.current.setLocalDescription(offerDescription);
+
+    // Store offer in Firestore
+    const offer = { sdp: offerDescription.sdp, type: offerDescription.type };
+    await callDoc.set({ offer });
+
+    // Listen for remote answer
+    callDoc.onSnapshot((snapshot) => {
+      const data = snapshot.data();
+      if (!peerConnection.current.currentRemoteDescription && data?.answer) {
+        const answerDescription = new RTCSessionDescription(data.answer);
+        peerConnection.current.setRemoteDescription(answerDescription);
+      }
+    });
+
+    // Listen for answer candidates
+    answerCandidates.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const candidate = new RTCIceCandidate(change.doc.data());
+          peerConnection.current.addIceCandidate(candidate);
+        }
+      });
+    });
+  };
+
+  const answerCall = async (callId) => {
+    const callDoc = firestore.collection("calls").doc(callId);
+    const offerCandidates = callDoc.collection("offerCandidates");
+    const answerCandidates = callDoc.collection("answerCandidates");
+
+    // Set up ice candidates for remote user
+    peerConnection.current.onicecandidate = (event) => {
+      if (event.candidate) {
+        answerCandidates.add(event.candidate.toJSON());
+      }
+    };
+
+    const callData = (await callDoc.get()).data();
+    const offerDescription = callData.offer;
+    await peerConnection.current.setRemoteDescription(new RTCSessionDescription(offerDescription));
+
+    const answerDescription = await peerConnection.current.createAnswer();
+    await peerConnection.current.setLocalDescription(answerDescription);
+
+    const answer = { type: answerDescription.type, sdp: answerDescription.sdp };
+    await callDoc.update({ answer });
+
+    // Listen for offer candidates
+    offerCandidates.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const candidate = new RTCIceCandidate(change.doc.data());
+          peerConnection.current.addIceCandidate(candidate);
+        }
+      });
+    });
+  };
+
+  return (
+    <div>
+      <h1>WebRTC Video Call callId {callerId} and receiverId {receiverId}</h1>
+      <video ref={localVideoRef} autoPlay playsInline></video>
+      <video ref={remoteVideoRef} autoPlay playsInline></video>
+      <button onClick={createOffer}>Create Offer</button>
+      <input
+        value={callId}
+        onChange={(e) => setCallId(e.target.value)}
+        placeholder="Enter Call ID to Answer"
+      />
+      <button onClick={() => answerCall(callId)}>Answer Call</button>
+    </div>
+  );
+};
+
+export default Video;
+
