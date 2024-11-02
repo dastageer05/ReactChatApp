@@ -9,7 +9,8 @@ import { auth } from "./lib/firebase";
 import { useUserStore } from "./lib/userStore";
 import { useChatStore } from "./lib/chatStore";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-
+import Register from "./components/login/Register";
+import Video from "./components/video/Video";
 
 const App = () => {
  
@@ -36,10 +37,12 @@ const App = () => {
             <Route path="/chat/:chatId" element={<Chat />} />
             <Route path="/detail" element={<Detail />} />
             <Route path="*" element={<Navigate to="/home" />} />
+            <Route path="/video/:callerId/:receiverId" element={<Video />} />
           </Routes>
         ) : (
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         )}

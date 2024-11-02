@@ -20,7 +20,6 @@ function Userinfo() {
       </div>
       <div className="icons">
         <img src="./more.png" alt="More options" />
-        <img src="./video.png" alt="Start video call" />
         <img src="./edit.png" alt="Edit user details" onClick={handleEditClick} />
       </div>
     </div>

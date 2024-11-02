@@ -13,7 +13,6 @@ import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
 import upload from "../../lib/upload";
 import { format } from "timeago.js";
-import Video from "../video/Video";
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,9 +25,7 @@ function Chat() {
     file: null,
     url: "",
   });
-  const [showVideo, setShowVideo] = useState(false);
   const navigate = useNavigate();
-  const handleCallEnd = () => setShowVideo(false);
 
   const { user, isCurrentUserBlocked, isReceiverBlocked } =
     useChatStore();
@@ -36,14 +33,14 @@ function Chat() {
 
   const endRef = useRef(null);
 
-  const handleClick = async () => {
-    console.log("helo");
-    setShowVideo(true);
-  };
-
   const handleEditClick = () => {
     navigate("/detail"); // Update with the correct path to Detail.jsx
   };
+
+  const handleVideoClick = () => {
+    // Navigate to the Video component route with callerId and receiverId
+    navigate(`/video/${currentUser.id}/${user.id}`);
+  }
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behevior: "smooth" });
@@ -132,24 +129,18 @@ function Chat() {
           <img src={user?.avatar || "./avatar.png"} alt="" />
           <div className="texts">
             <span>{user?.username}</span>
-            <p>Lorem ipsum dolor sit, amet </p>
+            <p>Lorem ipsum dolor</p>
             {/* need to work */}
           </div>
         </div>
         <div className="icons">
           <img src="/phone.png" alt="" />
-          <div >
-            {showVideo ? (
-              <Video callerId={currentUser.id} receiverId={user.id} onCallEnd={handleCallEnd}/>
-            ) : (
               <img
                 src="/video.png"
                 alt=""
-                onClick={handleClick}
+                onClick={handleVideoClick}
                 style={{ cursor: "pointer" }}
               />
-            )}
-          </div>
           <img src="/info.png" alt="Edit user" onClick={handleEditClick}/>
         </div>
       </div>
@@ -191,8 +182,8 @@ function Chat() {
             onChange={handleImg}
             disabled={isCurrentUserBlocked || isReceiverBlocked}
           />
-          <img src="/camera.png" alt="" />
-          <img src="/mic.png" alt="" />
+          <img src="/camera.png" alt="" className="disable"/>
+          <img src="/mic.png" alt="" className="disable"/>
         </div>
         <input
           type="text"
@@ -207,7 +198,7 @@ function Chat() {
         />
         <div className="emoji">
           <img
-            src="./emoji.png"
+            src="/emoji.png"
             alt=""
             onClick={() => setOpen((prev) => !prev)}
           />

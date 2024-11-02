@@ -14,6 +14,8 @@ import {
 import "./video.css";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/userStore";
+import { useParams } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const servers = {
   iceServers: [
@@ -26,7 +28,7 @@ const servers = {
   ],
 };
 
-const Video = ({ callerId, receiverId, onCallEnd }) => {
+const Video = () => {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const peerConnection = useRef(new RTCPeerConnection(servers));
@@ -34,9 +36,13 @@ const Video = ({ callerId, receiverId, onCallEnd }) => {
   const remoteStream = useRef(new MediaStream());
   const [callId, setCallId] = useState("");
   const [callComing, setcallComing] = useState(false);
+  const [callStarted, setCallStarted] = useState(false);
+  const { callerId, receiverId } = useParams();
 
   const { user } = useChatStore();
   const { currentUser } = useUserStore();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const initWebRTC = async () => {
@@ -67,6 +73,7 @@ const Video = ({ callerId, receiverId, onCallEnd }) => {
   }, [callerId]);
 
   const createOffer = async () => {
+    setCallStarted(true);
     const callDocRef = doc(collection(db, "calls"));
     const offerCandidates = collection(callDocRef, "offerCandidates");
     const answerCandidates = collection(callDocRef, "answerCandidates");
@@ -137,60 +144,79 @@ const Video = ({ callerId, receiverId, onCallEnd }) => {
   };
 
   const endCall = async () => {
-    if (callId) {  // Check if callId is defined
+    if (localStream.current) {
+      localStream.current.getTracks().forEach((track) => track.stop());
+      localStream.current = null;
+    }
+
+    // Close the peer connection
+    if (peerConnection.current) {
+      peerConnection.current.close();
+      peerConnection.current = null;
+    }
+
+    if (remoteStream.current) {
+      remoteStream.current.getTracks().forEach((track) => track.stop());
+      remoteStream.current = null; // Reset remoteStream for reuse if needed
+    }
+
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+    }
+
+    if (localVideoRef.current) {
+      localStream.current = null;
+      localVideoRef.current.srcObject = null;
+    }
+    if (callId) {
+      // Check if callId is defined
       const callDocRef = doc(db, "calls", callId);
-      await deleteDoc(callDocRef);  // Delete the main call document
+      await deleteDoc(callDocRef); // Delete the main call document
       console.log("Call ended and removed from Firestore.");
-      if (onCallEnd) onCallEnd();  // Notify parent component
+      navigate('/home');
     } else {
-      console.warn("No callId available to end the call.");
+      console.log(remoteVideoRef, localVideoRef);
+      navigate('/home');
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (callId) endCall();  // Call endCall only if callId exists
-      else if (onCallEnd) onCallEnd();  // Call onCallEnd to return to parent if needed
-    };
-  }, [callId]); 
-
   const checkForIncomingOffer = async () => {
-  try {
-    const q = query(
-      collection(db, "calls"),
-      where("receiverId", "==", currentUser.id)
-    );
-    const querySnapshot = await getDocs(q);
+    try {
+      const q = query(
+        collection(db, "calls"),
+        where("receiverId", "==", currentUser.id)
+      );
+      const querySnapshot = await getDocs(q);
 
-    if (!querySnapshot.empty) {
-      const callDoc = querySnapshot.docs[0];
-      setCallId(callDoc.id);  // set the call ID
-      const callData = callDoc.data();
+      if (!querySnapshot.empty) {
+        const callDoc = querySnapshot.docs[0];
+        setCallId(callDoc.id); // set the call ID
+        const callData = callDoc.data();
 
-      if (callData.offer) {
-        console.log("Incoming offer found, ready to answer");
-        setcallComing(true)
+        if (callData.offer) {
+          console.log("Incoming offer found, ready to answer");
+          setcallComing(true);
+        } else {
+          console.log("No offer found yet.");
+        }
       } else {
-        console.log("No offer found yet.");
+        console.log("No incoming call for this user.");
       }
-    } else {
-      console.log("No incoming call for this user.");
+    } catch (error) {
+      console.error("Error checking for incoming offer:", error);
     }
-  } catch (error) {
-    console.error("Error checking for incoming offer:", error);
-  }
-};
+  };
 
-// Triggering the correct logic based on current user role
-useEffect(() => {
-  console.log(currentUser.id, callerId, receiverId);
+  // Triggering the correct logic based on current user role
+  useEffect(() => {
+    console.log(currentUser.id, callerId, receiverId);
 
-  if (currentUser.id === callerId) {
-    checkForIncomingOffer();
-  } else if (currentUser.id === receiverId) {
-    createOffer();
-  }
-}, [currentUser.id, callerId, receiverId]);
+    if (currentUser.id === callerId) {
+      checkForIncomingOffer();
+    } else if (currentUser.id === receiverId) {
+      createOffer();
+    }
+  }, [currentUser.id, callerId, receiverId]);
 
   return (
     <div className="video">
@@ -200,24 +226,24 @@ useEffect(() => {
           <video ref={localVideoRef} autoPlay playsInline></video>
           <video ref={remoteVideoRef} autoPlay playsInline></video>
           <button onClick={() => answerCall(callId)}>Answer Call</button>
-          <button onClick={endCall}> Stop/end </button>
+          <button onClick={endCall}> Stop Call </button>
         </>
       ) : (
         <>
           <h2 className="heading">
             WebRTC Video Call: <br />
-            Caller: {currentUser.username} and <br />
+            Caller: {currentUser.username} 
             Receiver: {user.username}
           </h2>
           <video ref={localVideoRef} autoPlay playsInline></video>
           <video ref={remoteVideoRef} autoPlay playsInline></video>
-          <button onClick={createOffer}>Create Offer</button>
-        {/* <input
+          <button onClick={createOffer} disabled={callStarted}>Start Call</button>
+          {/* <input
           value={callId}
           onChange={(e) => setCallId(e.target.value)}
           placeholder="Enter Call ID to Answer"
         /> */}
-          <button onClick={endCall}> Stop </button>
+          <button onClick={endCall}> Stop Call </button>
         </>
       )}
     </div>

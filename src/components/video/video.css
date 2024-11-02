@@ -3,57 +3,85 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: transparent; /* Background color for the video container */
+  background-color: transparent; 
   border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(12, 121, 223, 0.295); /* Subtle shadow for depth */
+  box-shadow: 0 4px 15px rgba(12, 121, 223, 0.295); 
   padding: 20px;
- /* Center the video component */
   width: 100%;
   height: auto;
  
 
   h2 {
-    font-size: 1.1em; /* Heading size */
+    font-size: 1.1em; 
     margin-bottom: 20px;
-    color: white; /* Text color */
+    color: white; 
     padding: 10px;
   }
 
   video {
-    width: 100%; /* Responsive video width */
-  height: auto; /* Maintain aspect ratio */
-    border: 2px solid #007bff; /* Border color */
-    border-radius: 10px; /* Rounded corners for video */
-    margin-bottom: 20px; /* Space below the video */
-  }
+    width: 100%; 
+    height: auto; 
+    border: 2px solid #007bff;
+    border-radius: 10px; 
+    margin-bottom: 20px; 
 
-  button {
-    background-color: #007bff; /* Button background color */
-    color: white; /* Button text color */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    padding: 10px 20px; /* Button padding */
-    cursor: pointer; /* Pointer cursor on hover */
-    font-size: 1em; /* Font size */
-    margin: 5px; /* Space between buttons */
-    transition: background-color 0.3s; /* Smooth background transition */
-  }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px; 
+      cursor: pointer;
+      font-size: 1em;
+      margin: 5px; 
+      transition: background-color 0.3s; 
+    }
 
-  button:hover {
-    background-color: #0056b3; /* Darker background on hover */
-  }
+    button:hover {
+      background-color: #0056b3; 
+    }
 
-  input {
-    width: 100%; /* Full width input */
-    padding: 10px; /* Padding inside input */
-    border: 2px solid #007bff; /* Border color */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 1em; /* Font size */
-    margin-bottom: 10px; /* Space below input */
-  }
+    input {
+      width: 100%; 
+      padding: 10px; 
+      border: 2px solid #007bff;
+      border-radius: 5px; 
+      font-size: 1em; 
+      margin-bottom: 10px; /
+    }
 
-  input:focus {
-    outline: none; /* No outline on focus */
-    border-color: #0056b3; /* Darker border on focus */
+    input:focus {
+      outline: none; 
+      border-color: #0056b3; 
+    }
+  }
+}
+@media (max-width: 400px) {
+  .video {
+    box-shadow: 0 3px 10px rgba(12, 121, 223, 0.25); 
+    width: 100%; /* Ensures full width on small screens */
+    height: 700px;
+    h2 {
+      font-size: 0.8em; /* Slightly smaller text */
+      margin-bottom: 5px;
+    }
+
+    video {
+      width: 85%; /* Full width for video */
+      height: 222px; /* Maintain aspect ratio */
+      border: 1px solid #007bff; /* Slightly thinner border */
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 5px; 
+      font-size: 0.9em; 
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin: 5px;
+      width: 50%;
+    }
   }
 }

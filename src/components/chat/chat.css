@@ -70,10 +70,9 @@
       &.own {
         align-self: flex-end;
 
-        .texts {
-          p {
-            background-color: #5183fe;
-          }
+        .texts p {
+          background-color: #5183fe;
+          color: white;
         }
       }
 
@@ -109,27 +108,25 @@
       }
     }
   }
-  /* Scrollbar styles */
+
+  /* Custom scrollbar styles */
   .center::-webkit-scrollbar {
-    width: 10px; /* Width of the scrollbar */
+    width: 10px;
   }
 
-  /* Track styles (background of the scrollbar) */
   .center::-webkit-scrollbar-track {
-    background: #1e1e1e; /* Darker color for the track */
-    border-radius: 10px; /* Round the track corners */
+    background: #1e1e1e;
+    border-radius: 10px;
   }
 
-  /* Thumb styles (the scroll handle) */
   .center::-webkit-scrollbar-thumb {
-    background-color: #5183fe; /* Dark grey scroll handle */
-    border-radius: 10px; /* Round the scroll handle */
-    border: 2px solid #1e1e1e; /* Add a border to match the track */
+    background-color: #5183fe;
+    border-radius: 10px;
+    border: 2px solid #1e1e1e;
   }
 
-  /* Change thumb color on hover */
   .center::-webkit-scrollbar-thumb:hover {
-    background-color: #888888; /* Lighter grey scroll handle on hover */
+    background-color: #888888;
   }
 
   .bottom {
@@ -180,6 +177,7 @@
         left: 0;
       }
     }
+
     .sendButton {
       background-color: #5183fe;
       color: white;
@@ -187,11 +185,62 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      transition: background-color 0.3s;
 
       &:disabled {
         background-color: #5182feb4;
         cursor: not-allowed;
       }
+
+      &:hover:not(:disabled) {
+        background-color: #426acc;
+      }
+    }
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 400px) {
+  .chat {
+    .top .user img {
+      width: 50px;
+      height: 50px;
+    }
+
+    .center {
+      padding: 10px;
+      .message .texts {
+        width: auto;
+        p {
+          padding: 7px;
+        }
+      }
+    }
+    .bottom {
+      gap: 10px;
+      padding: 10px;
+
+      .emoji .picker{
+          position: fixed;
+          bottom: 60px;
+          left: 0;
+        }
+      }
+    .bottom input {
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    .bottom .sendButton {
+      padding-left: 10px;
+      padding-right: 50px;
+      padding-top: 7px;
+      padding-bottom: 7px;
+      width: 10px;
+    }
+
+    .disable {
+      display: none;
     }
   }
 }

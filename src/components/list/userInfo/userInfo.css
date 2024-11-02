@@ -21,10 +21,39 @@
     display: flex;
     gap: 20px;
 
-    img{
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
+    img {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
     }
+  }
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 400px) {
+  .userInfo {
+    padding: 15px;
+    display: flex;
+    margin-right: 35px;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .user {
+    gap: 10px; /* Reduce gap between user elements */
+  }
+
+  .icons {
+    gap: 10px; /* Reduce gap between icons */
+  }
+
+  .user img {
+    width: 40px; /* Smaller image size for user */
+    height: 40px; /* Smaller image size for user */
+  }
+
+  .icons img {
+    width: 16px; /* Smaller icon size */
+    height: 16px; /* Smaller icon size */
   }
 }

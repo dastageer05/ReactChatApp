@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./detail.css";
 import { auth, db } from "../../lib/firebase";
 import { useUserStore } from "../../lib/userStore";
@@ -8,7 +8,6 @@ import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 function Detail() {
   const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
     useChatStore();
-
   const { currentUser } = useUserStore();
 
   const handleBlock = async () => {
@@ -59,28 +58,7 @@ function Detail() {
                 />
                 <span>drstrange.jpg</span>
               </div>
-              <img src="./download.png" alt="" className="icon" />
-            </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img
-                  src="https://c4.wallpaperflare.com/wallpaper/365/584/63/movie-doctor-strange-benedict-cumberbatch-marvel-comics-wallpaper-preview.jpg"
-                  alt=""
-                />
-                <span>drstrange.jpg</span>
               </div>
-              <img src="./download.png" alt="download" className="icon" />
-            </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img
-                  src="https://c4.wallpaperflare.com/wallpaper/365/584/63/movie-doctor-strange-benedict-cumberbatch-marvel-comics-wallpaper-preview.jpg"
-                  alt=""
-                />
-                <span>drstrange.jpg</span>
-              </div>
-              <img src="./download.png" alt="" className="icon" />
-            </div>
           </div>
         </div>
         <div className="option">
